@@ -1,8 +1,6 @@
 from collections import defaultdict
 from itertools import takewhile
 
-WIDTH = 140
-
 # Extract numbers with start position in string
 def get_numbers(line):
     result = []
@@ -16,7 +14,6 @@ def get_numbers(line):
         if num:
             result.append((start, num))
     return result
-
 
 # Symbol is not digit and not '.'
 def is_symbol(ch):
@@ -37,15 +34,18 @@ def is_any_gear(s):
             return i
     return -1
 
-# Initialize input_lines with a single row of dots
-input_lines = [["." for i in range(WIDTH + 2)]]
-
 # Read lines from the file and add dots at the beginning and end
 with open('input.txt', 'r') as file:
-    input_lines += ['.' + line.strip() + '.' for line in file]
+    lines = ['.' + line.strip() + '.' for line in file]
+
+# Initialize input_lines with a single row of dots
+input_lines = [['.' for _ in range(len(lines[0]))]]
+
+# Add the lines with dots at the beginning and end
+input_lines += lines
 
 # Add the last row of dots
-input_lines.append(["." for i in range(WIDTH + 2)])
+input_lines.append(['.' for _ in range(len(lines[0]))])
 
 # Initialize a list to store numbers extracted from the input
 result_numbers = []
@@ -73,9 +73,6 @@ for i, line in enumerate(input_lines[:-1]):
                 gears[(i + j, gear_pos + pos)].append(int(number))
 
 # Calculate the result by multiplying pairs of gears and summing the results
-result = 0
-for k, v in gears.items():
-    if len(v) == 2:
-        result += v[0] * v[1]
+result = sum(v[0] * v[1] for k, v in gears.items() if len(v) == 2)
 
 print("Day 03 Part 2:", result)
