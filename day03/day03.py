@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import takewhile
 
 WIDTH = 140
 
@@ -6,18 +7,16 @@ WIDTH = 140
 def get_numbers(line):
     result = []
     i = 0
-    num = ""
     while i < len(line):
         while i < len(line) and not line[i].isdigit():
             i += 1
         start = i
-        while i < len(line) and line[i].isdigit():
-            num += line[i]
-            i += 1
-        if len(num) > 0:
+        num = ''.join(c for c in takewhile(str.isdigit, line[i:]))
+        i += len(num)
+        if num:
             result.append((start, num))
-            num = ""
     return result
+
 
 # Symbol is not digit and not '.'
 def is_symbol(ch):
@@ -52,24 +51,24 @@ input_lines.append(["." for i in range(WIDTH + 2)])
 result_numbers = []
 
 # Iterate through rows in input_lines (excluding the first and last rows)
-for i in range(1, len(input_lines) - 1):
-    lst = get_numbers(input_lines[i])
-    for pos, number in lst:
-        for j in [-1, 0, 1]:
-            if is_any_symbol(input_lines[i + j][pos - 1 : pos + len(number) + 1]):
-                result_numbers.append(int(number))
+result_numbers.extend(
+    int(number)
+    for i in range(1, len(input_lines) - 1)
+    for pos, number in get_numbers(input_lines[i])
+    for j in [-1, 0, 1]
+    if is_any_symbol(input_lines[i + j][pos - 1 : pos + len(number) + 1]))
 
-print("day 3, part 1:", sum(result_numbers))
+
+print("Day 03 Part 1:", sum(result_numbers))
 
 # Initialize a defaultdict to store gears at different positions
 gears = defaultdict(list)
 
 # Iterate through rows in input_lines (excluding the last row)
-for i in range(len(input_lines) - 1):
-    lst = get_numbers(input_lines[i])
-    for pos, number in lst:
+for i, line in enumerate(input_lines[:-1]):
+    for pos, number in get_numbers(line):
         for j in [-1, 0, 1]:
-            gear_pos = is_any_gear(input_lines[i + j][pos - 1 : pos + len(number) + 1])
+            gear_pos = is_any_gear(input_lines[i + j][pos - 1: pos + len(number) + 1])
             if gear_pos != -1:
                 gears[(i + j, gear_pos + pos)].append(int(number))
 
@@ -79,4 +78,4 @@ for k, v in gears.items():
     if len(v) == 2:
         result += v[0] * v[1]
 
-print("day 3, part 2:", result)
+print("Day 03 Part 2:", result)
