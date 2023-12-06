@@ -1,4 +1,4 @@
-with open('in.txt') as f:
+with open('input.txt') as f:
     lines = f.read().split("\n\n")
     maps = lines[1::]
     x = list(map(int, lines[0].split(":")[1].strip().split()))
